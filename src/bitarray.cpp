@@ -20,6 +20,15 @@
 #define BIT_IN_CHAR(bit) (1 << ((bit) % CHAR_BIT))
 #define BITS_TO_CHARS(bits) ((((bits) - 1) / CHAR_BIT) + 1)
 //<<----------------------
+bitarray::bit_proxy::operator bool() const
+{
+    return m_bits.get(m_bit);
+}
+
+void bitarray::bit_proxy::operator=(bool state)
+{
+    state ? m_bits.set(m_bit) : m_bits.clear(m_bit);
+}
 
 void bitarray::set()
 {
@@ -55,6 +64,11 @@ void bitarray::set(uint32_t bit)
     m_array[BIT_CHAR(bit)] |= BIT_IN_CHAR(bit);
 }
 
+bool bitarray::get(uint32_t bit) const
+{
+    return m_array[BIT_CHAR(bit)] & BIT_IN_CHAR(bit);
+}
+
 void bitarray::clear(uint32_t bit)
 {
     if (m_num_bits <= bit)
@@ -76,6 +90,15 @@ void bitarray::reverse()
     std::reverse(istart, iend);
 }
 
+bitarray::bit_proxy bitarray::operator[](uint32_t bit)
+{
+    if (m_num_bits <= bit)
+    {
+        exit(1); /* bit out of range */
+    }
+
+    return bitarray::bit_proxy{*this, bit};
+}
 //>>---------------------- C Api
 /**
  * @brief C array for bitarray class, size >= sizeof(bitarray)
@@ -119,5 +142,10 @@ void bitarray_clear(void *handle, uint32_t bit)
 void bitarray_reverse(void *handle)
 {
     static_cast<bitarray *>(handle)->reverse();
+}
+
+bool bitarray_get(const void *handle, uint32_t bit)
+{
+    return static_cast<const bitarray *>(handle)->get(bit);
 }
 //<<----------------------
