@@ -16,6 +16,6 @@ endif()
 
 set_property(GLOBAL PROPERTY RULE_MESSAGES OFF)
 
-project(bitarray VERSION 0.0.1 LANGUAGES C CXX ASM)
+project(bitarray VERSION 0.0.2 LANGUAGES C CXX ASM)
 
 add_subdirectory(examples)
